@@ -1,0 +1,19 @@
+[[source]]
+name = "pypi"
+url = "https://pypi.org/simple"
+verify_ssl = true
+
+[dev-packages]
+
+[packages]
+pika = "*"
+requests = "*"
+PyYAML = "*"
+html-testRunner = "*"
+
+[requires]
+python_version = "3.6"
+
+[scripts]
+start  = "python app.py"
+test  = "python test.py"

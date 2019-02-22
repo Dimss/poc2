@@ -1,0 +1,22 @@
+kind: "BuildConfig"
+apiVersion: "v1"
+metadata:
+  name: "poc2-consumer"
+spec:
+  source:
+    git:
+      uri: "http://10.166.0.11/root/poc2-consumer.git"
+      ref: "master"
+  strategy:
+    jenkinsPipelineStrategy:
+      jenkinsfile:
+      env:
+      - name: "GOVIL_APP_NAME"
+        value: "poc2-consumer"
+      - name: "S2I_BUILD_IMAGE"
+        value: "python:3.6"
+      - name: "DOCKER_IMAGE_PREFIX"
+        value: "dimssss"
+      - name: "DOCKER_REGISTRY"
+        value: "docker.io"
+    type: JenkinsPipeline

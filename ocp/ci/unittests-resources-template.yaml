@@ -1,0 +1,56 @@
+apiVersion: template.openshift.io/v1
+kind: Template
+labels:
+  template: poc1-unittests-template
+message: |-
+  Unitetests resources template
+metadata:
+  annotations:
+    description: |-
+      Unitetes resources template
+    iconClass: acorn
+    openshift.io/display-name: POC1 Unittests template
+  name: poc1-unittests-template
+objects:
+- kind: Service
+  apiVersion: v1
+  metadata:
+    name: "${RABBITMQ_NAME}"
+  spec:
+    selector:
+      app: "${RABBITMQ_NAME}"
+    ports:
+    - name: "${RABBITMQ_NAME}"
+      port: 5672
+- kind: Deployment
+  apiVersion: apps/v1
+  metadata:
+    name: "${RABBITMQ_NAME}"
+    labels:
+      app: "${RABBITMQ_NAME}"
+  spec:
+    replicas: 1
+    selector:
+      matchLabels:
+        app: "${RABBITMQ_NAME}"
+    template:
+      metadata:
+        labels:
+          app: "${RABBITMQ_NAME}"
+      spec:
+        containers:
+        - name: "rabbitmq"
+          image: "rabbitmq:latest"
+          ports:
+          - containerPort: 5672
+          readinessProbe:
+            tcpSocket:
+              port: 5672
+            initialDelaySeconds: 0
+            periodSeconds: 3
+parameters:
+- description: RabbitMQ name
+  displayName: RabbitMQ name for Deployment and Service objects
+  name: RABBITMQ_NAME
+  required: true
+  value: :"rabbitmq"
