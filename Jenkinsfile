@@ -204,6 +204,7 @@ pipeline {
                     openshift.withCluster() {
                         openshift.withProject() {
                             deployPoc12Dependency()
+
                             deployPoc2Consumer()
                         }
                     }
