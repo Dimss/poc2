@@ -1,0 +1,48 @@
+apiVersion: template.openshift.io/v1
+kind: Template
+labels:
+  template: poc2consumer
+message: |-
+  POC2 Consumer template
+metadata:
+  annotations:
+    description: |-
+      POC2 Consumer template
+    iconClass: acorn
+    openshift.io/display-name: Poc2 Consumer
+  name: poc2consumer-cr
+objects:
+- apiVersion: gov.il/v1alpha1
+  kind: Poc2Consumer
+  metadata:
+    name: ${APP_NAME}
+    labels:
+      profile: ${PROFILE}
+  spec:
+    appName: ${APP_NAME}
+    size: ${SIZE}
+    profile: ${PROFILE}
+    namespace: ${NAMESPACE}
+    depOwner: poc12
+    image: ${IMAGE}
+parameters:
+- description: Name of the app
+  displayName: The application name
+  name: APP_NAME
+  required: true
+- description: Number of ReactSample instances to create
+  displayName: number of instacens
+  name: SIZE
+  required: true
+- description: Runtime profile
+  displayName: Runtime profile
+  name: PROFILE
+  required: true
+- description: Docker image name
+  displayName: Docker image name
+  name: IMAGE
+  required: true
+- description: Namespace
+  displayName: OpenShift project name
+  name: NAMESPACE
+  required: true

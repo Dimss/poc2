@@ -1,0 +1,54 @@
+apiVersion: template.openshift.io/v1
+kind: Template
+labels:
+  template: Poc12Dep
+message: |-
+  Poc12Dep template
+metadata:
+  annotations:
+    description: |-
+      This is a dependency CR template for Poc1Producer and Poc2Consumer.
+      This CR templates creates ConfigMap and RabbitMQ instacies for dev invironment
+    iconClass: fa fa-mixcloud
+    openshift.io/display-name: Poc12Dep
+    openshift.io/provider-display-name: GovIL-ReactSample by RH PS
+  name: poc12dep-cr
+objects:
+- kind: Poc12Dep
+  apiVersion: gov.il/v1alpha1
+  metadata:
+    name: ${APP_NAME} # poc12-rabbitmq-dev
+  spec:
+    depOwner: poc12
+    profile: ${PROFILE}
+    namespace: ${NAMESPACE}
+    service: ${APP_NAME}
+    image: ${IMAGE}
+    routeHostSuffix: ${ROUTE_HOST_SUFFIX} # router.default.svc.cluster.local
+    queueName: ${QUEUE_NAME}
+parameters:
+- description: Name of the app
+  displayName: The application name
+  name: APP_NAME
+  required: true
+- description: Runtime profile
+  displayName: Runtime profile
+  name: PROFILE
+  required: true
+- description: Docker image name
+  displayName: Docker image name
+  name: IMAGE
+  required: true
+- description: Namespace
+  displayName: OpenShift project name
+  name: NAMESPACE
+  required: true
+- description: Route host suffix for example (router.default.svc.cluster.local)
+  displayName: Route host suffix
+  name: ROUTE_HOST_SUFFIX
+  required: true
+- description: Queue name to use for both Producer & Consumer app
+  displayName: Queue name
+  name: QUEUE_NAME
+  required: true
+

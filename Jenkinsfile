@@ -38,6 +38,57 @@ def getDockerImageTag() {
     }
 }
 
+def deployPoc12Dependency(){
+    openshift.withCluster() {
+        openshift.withProject() {
+            def poc12dep = openshift.selector("poc12dep")
+            if (poc12dep.exists()){
+                echo "Dependency for Poc1Producer and Poc2Consumer already exists, gonna skip Pod12Dep creation"
+                return
+            }
+            def crDepTemplate = readFile('ocp/cd/cr-dep-template.yaml')
+            def appName = "poc12-rabbitmq-dev"
+            def profile = getProfile()
+            def image = "docker.io/rabbitmq:3-management"
+            def namespace = openshift.project()
+            def routeHostSuffix = "router.default.svc.cluster.local"
+            def queueName = "sites"
+
+            def models = openshift.process(crDepTemplate,
+                    "-p=APP_NAME=${appName}",
+                    "-p=NAMESPACE=${namespace}",
+                    "-p=IMAGE=${image}",
+                    "-p=ROUTE_HOST_SUFFIX=${routeHostSuffix}",
+                    "-p=QUEUE_NAME=${queueName}",
+                    "-p=PROFILE=${profile}")
+            echo "${JsonOutput.prettyPrint(JsonOutput.toJson(models))}"
+            openshift.create(models)
+        }
+    }
+}
+
+def deployPoc2Consumer(){
+    openshift.withCluster() {
+        openshift.withProject() {
+            def size = 1
+            def appName = getAppName()
+            def namespace = openshift.project()
+            def image = "${env.DOCKER_REGISTRY}/${env.DOCKER_IMAGE_PREFIX}/${GOVIL_APP_NAME}:${getDockerImageTag()}"
+            def profile = getProfile()
+            def crTemplate = readFile('ocp/cd/cr-app-template.yaml')
+            def models = openshift.process(crTemplate,
+                    "-p=SIZE=${size}",
+                    "-p=APP_NAME=${appName}",
+                    "-p=NAMESPACE=${namespace}",
+                    "-p=IMAGE=${image}",
+                    "-p=PROFILE=${profile}")
+            echo "${JsonOutput.prettyPrint(JsonOutput.toJson(models))}"
+            openshift.create(models)
+        }
+    }
+
+}
+
 pipeline {
     agent {
         node {
@@ -141,6 +192,19 @@ pipeline {
                             def build = bc.startBuild()
                             build.logs("-f")
                             openshift.delete(models)
+                        }
+                    }
+                }
+            }
+        }
+
+        stage("Deploy to OpenShift") {
+            steps {
+                script {
+                    openshift.withCluster() {
+                        openshift.withProject() {
+                            deployPoc12Dependency()
+                            deployPoc2Consumer()
                         }
                     }
                 }
