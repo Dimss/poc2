@@ -30,6 +30,14 @@ def getGitTag() {
     }
 }
 
+def getProfile(){
+    if (env.gitlabActionType == "TAG_PUSH") {
+        return "lab"
+    } else {
+        return "dev"
+    }
+}
+
 def getDockerImageTag() {
     if (env.gitlabActionType == "TAG_PUSH") {
         return getGitTag()
