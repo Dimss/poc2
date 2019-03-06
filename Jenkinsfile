@@ -33,6 +33,7 @@ def getGitTag() {
 def getProfile(){
     if (env.gitlabActionType == "TAG_PUSH") {
         return "lab"
+        
     } else {
         return "dev"
     }
